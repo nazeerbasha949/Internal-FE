@@ -1,0 +1,22 @@
+.font-gothic-round .font-extrabold, .font-gothic-round.font-extrabold {
+    font-family: gothic-round-bold;
+    /* font-weight: 900; */
+}
+
+.shimmer-text {
+  position: relative;
+  background: linear-gradient(90deg, #fff 0%, #e0c3fc 40%, #a1c4fd 60%, #fff 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 2.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

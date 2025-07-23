@@ -1,0 +1,55 @@
+html, body {
+  height: 100%;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #311188 0%, #0A081E 100%);
+  color: white;
+  /* overflow: hidden; */
+  box-sizing: border-box;
+}
+
+/* Hide scrollbars for all browsers */
+
+
+@import url('https://fonts.googleapis.com/css2?family=Spoof+Trial:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap');
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #311188 transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #311188;
+  border-radius: 20px;
+  border: transparent;
+}
+
+/* Custom font class for Spoof Trial */
+.font-spoof {
+  font-family: 'Spoof Trial', sans-serif;
+}
+
+/* Custom font class for Gothic Round Bold (using Montserrat Black as fallback) */
+.font-gothic-round-bold {
+  font-family: 'Montserrat', 'Arial Rounded MT Bold', 'Arial', sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@import "tailwindcss";
