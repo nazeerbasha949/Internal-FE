@@ -2,13 +2,21 @@ pipeline {
     agent any
 
     environment {
-        NODE_ENV = 'production'
+        APP_DIR = '/home/ubuntu/Internal-FE'
+        DEPLOY_DIR = '/var/www/html/frontend'
+        REPO_URL = 'https://github.com/nazeerbasha949/Internal-FE.git'
     }
 
     stages {
-        stage('Clone Repo') {
+        stage('Clean Workspace') {
             steps {
-                git branch: 'main', url: 'https://github.com/nazeerbasha949/Internal-FE.git'
+                deleteDir()
+            }
+        }
+
+        stage('Clone Frontend Repo') {
+            steps {
+                git branch: 'main', url: "${env.REPO_URL}"
             }
         }
 
@@ -18,19 +26,34 @@ pipeline {
             }
         }
 
-        stage('Build Frontend') {
+        stage('Build Vite App') {
             steps {
                 sh 'npm run build'
             }
         }
 
-        stage('Deploy Frontend') {
+        stage('Deploy to NGINX') {
             steps {
                 sh '''
-                    sudo rm -rf /var/www/html/*
-                    sudo cp -r dist/* /var/www/html/
+                    sudo rm -rf ${DEPLOY_DIR}/*
+                    sudo cp -r dist/* ${DEPLOY_DIR}/
                 '''
             }
+        }
+
+        stage('Restart NGINX') {
+            steps {
+                sh 'sudo systemctl restart nginx'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Frontend deployed successfully!'
+        }
+        failure {
+            echo '❌ Deployment failed!'
         }
     }
 }
