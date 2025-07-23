@@ -1,54 +1,33 @@
 pipeline {
-    agent any
+  agent any
 
-    options {
-        timeout(time: 10, unit: 'MINUTES') // Kill after 10 mins if stuck
+  stages {
+    stage('Clone Code') {
+      steps {
+        git 'https://github.com/nazeerbasha949/Internal-FE.git'
+      }
     }
 
-    environment {
-        NODE_ENV = 'production'
+    stage('Install Dependencies') {
+      steps {
+        sh 'npm install'
+      }
     }
 
-    stages {
-        stage('Clone Repo') {
-            steps {
-                git branch: 'main', url: 'https://github.com/nazeerbasha949/Internal-FE.git'
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install --include=dev'
-            }
-        }
-
-        stage('Build Vite App') {
-            steps {
-                sh 'npm run build'
-            }
-        }
-
-        stage('Deploy to NGINX') {
-            steps {
-                // This must work without password
-                sh 'sudo rm -rf /var/www/html/*'
-                sh 'sudo cp -r dist/* /var/www/html/'
-            }
-        }
-
-        stage('Restart NGINX') {
-            steps {
-                sh 'sudo systemctl restart nginx'
-            }
-        }
+    stage('Build Project') {
+      steps {
+        sh 'npm run build'
+      }
     }
 
-    post {
-        success {
-            echo '✅ Frontend deployed successfully!'
-        }
-        failure {
-            echo '❌ Something went wrong...'
-        }
+    stage('Deploy to Apache Web Server') {
+      steps {
+        echo "Deploying to /var/www/html"
+        sh '''
+          sudo rm -rf /var/www/html/*
+          sudo cp -r dist/* /var/www/html/
+        '''
+      }
     }
+  }
 }
