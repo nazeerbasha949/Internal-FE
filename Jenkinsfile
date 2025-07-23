@@ -2,9 +2,7 @@ pipeline {
     agent any
 
     environment {
-        APP_DIR = '/home/ubuntu/Internal-FE'
-        DEPLOY_DIR = '/var/www/html/frontend'
-        REPO_URL = 'https://github.com/nazeerbasha949/Internal-FE.git'
+        NODE_ENV = 'production'
     }
 
     stages {
@@ -16,7 +14,7 @@ pipeline {
 
         stage('Clone Frontend Repo') {
             steps {
-                git branch: 'main', url: "${env.REPO_URL}"
+                git branch: 'main', url: 'https://github.com/nazeerbasha949/Internal-FE.git'
             }
         }
 
@@ -35,25 +33,25 @@ pipeline {
         stage('Deploy to NGINX') {
             steps {
                 sh '''
-                    sudo rm -rf ${DEPLOY_DIR}/*
-                    sudo cp -r dist/* ${DEPLOY_DIR}/
+                    sudo -S rm -rf /var/www/html/frontend/*
+                    sudo -S cp -r dist/* /var/www/html/frontend/
                 '''
             }
         }
 
         stage('Restart NGINX') {
             steps {
-                sh 'sudo systemctl restart nginx'
+                sh 'sudo -S systemctl restart nginx'
             }
         }
     }
 
     post {
-        success {
-            echo '✅ Frontend deployed successfully!'
-        }
         failure {
             echo '❌ Deployment failed!'
+        }
+        success {
+            echo '✅ Frontend deployed successfully!'
         }
     }
 }
