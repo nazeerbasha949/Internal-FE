@@ -1,12 +1,16 @@
 pipeline {
     agent any
 
+    options {
+        timeout(time: 10, unit: 'MINUTES') // Kill after 10 mins if stuck
+    }
+
     environment {
         NODE_ENV = 'production'
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Clone Repo') {
             steps {
                 git branch: 'main', url: 'https://github.com/nazeerbasha949/Internal-FE.git'
             }
@@ -14,12 +18,11 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                // Install dev dependencies too (for @vitejs/plugin-react)
                 sh 'npm install --include=dev'
             }
         }
 
-        stage('Build Frontend') {
+        stage('Build Vite App') {
             steps {
                 sh 'npm run build'
             }
@@ -27,23 +30,25 @@ pipeline {
 
         stage('Deploy to NGINX') {
             steps {
-                script {
-                    // Clear existing deployment
-                    sh 'sudo rm -rf /var/www/html/*'
-                    
-                    // Copy Vite build output
-                    sh 'sudo cp -r dist/* /var/www/html/'
-                }
+                // This must work without password
+                sh 'sudo rm -rf /var/www/html/*'
+                sh 'sudo cp -r dist/* /var/www/html/'
+            }
+        }
+
+        stage('Restart NGINX') {
+            steps {
+                sh 'sudo systemctl restart nginx'
             }
         }
     }
 
     post {
         success {
-            echo '🎉 Frontend deployment completed successfully!'
+            echo '✅ Frontend deployed successfully!'
         }
         failure {
-            echo '❌ Frontend deployment failed. Please check errors above!'
+            echo '❌ Something went wrong...'
         }
     }
 }
