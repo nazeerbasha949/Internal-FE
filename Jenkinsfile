@@ -6,13 +6,7 @@ pipeline {
     }
 
     stages {
-        stage('Clean Workspace') {
-            steps {
-                deleteDir()
-            }
-        }
-
-        stage('Clone Frontend Repo') {
+        stage('Clone Repository') {
             steps {
                 git branch: 'main', url: 'https://github.com/nazeerbasha949/Internal-FE.git'
             }
@@ -20,11 +14,12 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                // Install dev dependencies too (for @vitejs/plugin-react)
+                sh 'npm install --include=dev'
             }
         }
 
-        stage('Build Vite App') {
+        stage('Build Frontend') {
             steps {
                 sh 'npm run build'
             }
@@ -32,26 +27,23 @@ pipeline {
 
         stage('Deploy to NGINX') {
             steps {
-                sh '''
-                    sudo -S rm -rf /var/www/html/frontend/*
-                    sudo -S cp -r dist/* /var/www/html/frontend/
-                '''
-            }
-        }
-
-        stage('Restart NGINX') {
-            steps {
-                sh 'sudo -S systemctl restart nginx'
+                script {
+                    // Clear existing deployment
+                    sh 'sudo rm -rf /var/www/html/*'
+                    
+                    // Copy Vite build output
+                    sh 'sudo cp -r dist/* /var/www/html/'
+                }
             }
         }
     }
 
     post {
-        failure {
-            echo '❌ Deployment failed!'
-        }
         success {
-            echo '✅ Frontend deployed successfully!'
+            echo '🎉 Frontend deployment completed successfully!'
+        }
+        failure {
+            echo '❌ Frontend deployment failed. Please check errors above!'
         }
     }
 }
